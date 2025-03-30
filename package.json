@@ -1,0 +1,25 @@
+{
+  "name": "authentication-using-node-express",
+  "version": "1.0.0",
+  "description": "This a complete project for authetication using Node.js & Express.js",
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "serve": "nodemon main.js"
+  },
+  "author": "Vinay Bhardwaj",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.1",
+    "nodemailer": "^6.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
