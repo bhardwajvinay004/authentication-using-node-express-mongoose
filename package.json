@@ -1,11 +1,11 @@
 {
-  "name": "authentication-using-node-express",
+  "name": "jwt-token-based-authentication-using-nodejs-expressjs-mongoose",
   "version": "1.0.0",
-  "description": "This a complete project for authetication using Node.js & Express.js",
+  "description": "JWT Token based Authetication project using Node.js, Express.js & Mongoose",
   "type": "module",
   "main": "main.js",
   "scripts": {
-    "serve": "nodemon main.js"
+    "server:start": "nodemon main.js"
   },
   "author": "Vinay Bhardwaj",
   "license": "ISC",
