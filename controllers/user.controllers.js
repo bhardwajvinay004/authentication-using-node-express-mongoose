@@ -129,6 +129,84 @@ const verifyEmail = async (req, res) => {
   }
 };
 
+const resendVerificationEmail = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validate Request Body data
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide an email address and password",
+      });
+    }
+
+    // Fetch an existing User using Email address
+    const user = await User.findOne({ email });
+
+    // Check if the user exists and is verified or not
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Check if the user is already verified
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "User already verified",
+      });
+    }
+
+    // Check if the password is correct
+    const isPasswordMatching = await user.comparePassword(password);
+    if (!isPasswordMatching) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    // Check if token already exists
+    if (user.verificationToken && user.verificationTokenExpiry > Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already sent. Please check your inbox",
+      });
+    }
+
+    // Generate a verification token and expiry time
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const verificationTokenExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    user.verificationToken = verificationToken;
+    user.verificationTokenExpiry = verificationTokenExpiry;
+    await user.save();
+
+    // Send a verification email
+    await sendVerifyEmail(user.email, verificationToken);
+    return res.status(201).json({
+      success: true,
+      message: "Verfification email resent successfully",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        isVerified: user.isVerified,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
 // Login Controller
 const login = async (req, res) => {
   try {
@@ -146,10 +224,26 @@ const login = async (req, res) => {
     const user = await User.findOne({ email });
 
     // Check if the user exists and is verified or not
-    if (!user || !user.isVerified) {
+    if (!user) {
       return res.status(400).json({
         success: false,
         message: "Invalid email or password",
+      });
+    }
+
+    // Check if the user exists and is verified or not
+    if (!user.isVerified) {
+      // Check if verification token expired or not
+      if (user.verificationTokenExpiry < Date.now()) {
+        return res.status(400).json({
+          success: false,
+          message: "Verification token expired",
+        });
+      }
+
+      return res.status(400).json({
+        success: false,
+        message: "Please verify your email before logging in",
       });
     }
 
@@ -251,4 +345,11 @@ const logout = async (req, res) => {
   }
 };
 
-export { register, verifyEmail, login, logout, userProfile };
+export {
+  register,
+  verifyEmail,
+  resendVerificationEmail,
+  login,
+  logout,
+  userProfile,
+};

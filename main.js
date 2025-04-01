@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import db from "./utils/mongo-db.utils.js";
+import dbConnect from "./utils/mongo-db.utils.js";
 import userRoutes from "./routes/user.routes.js";
 
 dotenv.config();
@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
   res.send("Wow! Server is up and running!");
 });
 
-db();
+dbConnect();
 
 app.use("/api/v1/user", userRoutes);
 

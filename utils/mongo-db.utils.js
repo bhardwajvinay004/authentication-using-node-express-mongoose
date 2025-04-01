@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const db = () => {
+const dbConnect = () => {
   mongoose
     .connect(process.env.MONGO_DB_URI)
     .then(() => {
@@ -12,4 +12,4 @@ const db = () => {
     .catch((err) => console.log("Error connecting Mongo DB: ", err));
 };
 
-export default db;
+export default dbConnect;
